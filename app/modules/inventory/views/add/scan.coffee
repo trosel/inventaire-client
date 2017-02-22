@@ -1,6 +1,7 @@
 zxing = require 'modules/inventory/lib/scanner/zxing'
 embedded_ = require 'modules/inventory/lib/scanner/embedded'
 zxingLocalSetting = window.localStorageBoolApi 'use-zxing-scanner'
+files_ = require 'lib/files'
 
 module.exports = Marionette.ItemView.extend
   className: 'scan'
@@ -21,6 +22,7 @@ module.exports = Marionette.ItemView.extend
     # should open the href url
     'click #zxingScanner': 'setAddModeScanZxing'
     'change .toggler-input': 'toggleZxing'
+    'change #staticImageScanner': 'scanStaticImage'
 
   setAddModeScanZxing: -> app.execute 'last:add:mode:set', 'scan:zxing'
   startEmbeddedScanner: -> app.execute 'show:scanner:embedded'
@@ -36,6 +38,13 @@ module.exports = Marionette.ItemView.extend
     # wait for the end of the toggle animation
     # keep in sync with app/modules/general/scss/_toggler.scss
     setTimeout @render.bind(@), 400
+
+  scanStaticImage: (e)->
+    files_.parseFileEventAsDataURL e
+    .then _.Log('filesDataUrl')
+    .then (dataUrlsArray)-> embedded_.staticScan dataUrlsArray[0]
+    .then (results)=> @$el.find('.inner').append "<p>#{JSON.stringify(results)}<p>"
+    .catch (err)=> @$el.find('.inner').append "<p>#{err.message}<p>"
 
 prepareEmbeddedScanner = (useZxing)->
   useZxing ?= zxingLocalSetting.get()

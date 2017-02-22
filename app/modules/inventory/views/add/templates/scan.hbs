@@ -1,4 +1,4 @@
-{{#if hasVideoInput}}
+{{!-- {{#if hasVideoInput}}
   <section class="inner">
     <a class="button radius bold secondary"
     {{#if useZxing.checked}}
@@ -30,18 +30,11 @@
         </li>
       {{/each}}
     </ul>
-{{else}}
+{{else}} --}}
   <section class="inner">
     <h3>{{i18n 'add_by_barcode_scan'}}</h3>
-    <p class="disabled">
-      {{icon 'ban'}}
-      {{#if doesntSupportEnumerateDevices}}
-        <span>{{{i18n 'scanner_disabled_tip_2'}}}</span>
-      {{else}}
-        <span>{{{i18n 'requires an activated camera'}}}</span>
-      {{/if}}
-    </p>
+    <input id="staticImageScanner" type="file" accept="image/*" />
   </section>
-{{/if}}
+{{!-- {{/if}} --}}
 
 {{!-- TODO: add a note on the possibility to use barcode reader devices --}}

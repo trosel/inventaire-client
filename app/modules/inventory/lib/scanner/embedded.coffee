@@ -16,6 +16,34 @@ module.exports =
     .then (isbn)-> app.execute 'show:entity:add', "isbn:#{isbn}"
     .catch _.ErrorRethrow('embedded scanner err')
 
+  staticScan: (dataUrl)->
+    console.log('staticScan dataUrl', dataUrl)
+    options =
+      inputStream: {
+          size: 800,
+          singleChannel: false
+      },
+      locator: {
+          patchSize: "medium",
+          halfSample: true
+      },
+      decoder: {
+          readers: [{
+              format: "ean_reader",
+              config: {}
+          }]
+      },
+      locate: true,
+      src: dataUrl
+
+    getQuagga()
+    .then ->
+      return new Promise (resolve, reject)->
+        Quagga.decodeSingle options, (result) ->
+          _.log result, 'result'
+          if result?.codeResult then resolve result.codeResult.code
+          else reject new Error('not detected')
+
 startScanning = (beforeStart)->
   new Promise (resolve, reject, onCancel)->
     constraints = getConstraints()
@@ -77,8 +105,6 @@ baseOptions =
   # disabling locate as I couldn't make it work:
   # the user is thus expected to be aligned with the barcode
   locate: false
-  # locate: true
   decoder:
     readers: [ 'ean_reader' ]
     multiple: false
-
