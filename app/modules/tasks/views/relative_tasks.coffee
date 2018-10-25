@@ -1,7 +1,7 @@
 RelativeTask = Marionette.ItemView.extend
   className: ->
     classes = 'relative-task'
-    # if @model.get('hasEncyclopediaOccurence') then classes += ' good-candidate'
+    # if @model.get('externalSourcesOccurrences') then classes += ' good-candidate'
     if @model.get('globalScore') > 10 then classes += ' good-candidate'
     return classes
 
