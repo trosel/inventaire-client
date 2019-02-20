@@ -30,9 +30,8 @@ module.exports = ->
     itemDestroy: ->
       afterDestroy = @afterDestroy?.bind(@) or cb = -> console.log 'item deleted'
       itemDestroyBack = @itemDestroyBack?.bind(@)
-      app.request 'item:destroy',
-        model: @model
-        selector: @uniqueSelector
+      app.request 'items:delete',
+        items: [ @model ]
         next: afterDestroy
         back: itemDestroyBack
 
