@@ -175,14 +175,21 @@ module.exports = Marionette.CompositeView.extend
   resetResults: (searchId, results)->
     # Ignore results from any search that isn't the latest search
     if searchId? and searchId isnt @_lastSearchId then return
+
     @resetHighlightIndex()
-    if results? then @stopLoadingSpinner()
+
+    if results?
+      @stopLoadingSpinner()
+      @_lastResultsLength = results.length
+      @collection.reset results
+    else
+      @collection.reset()
+
     if results? and results.length is 0
       @$el.addClass 'no-results'
     else
       @$el.removeClass 'no-results'
       @setTimeout @showShortcuts.bind(@), 1000
-    @collection.reset results
 
   highlightNext: -> @highlightIndexChange 1
   highlightPrevious: -> @highlightIndexChange -1
@@ -219,6 +226,9 @@ module.exports = Marionette.CompositeView.extend
     if scrollBottom is scrollHeight then @loadMore()
 
   loadMore: ->
+    # Do not try to fetch more results if the last batch was incomplete
+    if @_lastResultsLength < searchBatchLength then return @stopLoadingSpinner()
+
     @showLoadingSpinner()
     @_searchOffset += searchBatchLength
     @_search @_lastSearch
@@ -227,6 +237,7 @@ module.exports = Marionette.CompositeView.extend
   addNewResults: (results)->
     currentResultsUri = @collection.map (model)-> model.get('uri')
     newResults = results.filter (result)-> result.uri not in currentResultsUri
+    @_lastResultsLength = newResults.length
     @collection.add newResults
 
 sectionToTypes =
